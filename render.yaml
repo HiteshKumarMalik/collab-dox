@@ -1,0 +1,36 @@
+services:
+  # Backend Node.js Service
+  - type: web
+    name: collab-editor-api
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CLIENT_URL
+        fromService:
+          type: web # Note: Render Static Sites are referenced as type web in env vars sometimes, wait, Render allows frontends to be statically hosted. Wait, Static sites expose urls.
+          name: collab-editor-web
+          envVarKey: RENDER_EXTERNAL_URL
+
+  # Frontend Static Site Service
+  - type: web
+    name: collab-editor-web
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: collab-editor-api
+          envVarKey: RENDER_EXTERNAL_URL
