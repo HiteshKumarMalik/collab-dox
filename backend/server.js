@@ -58,8 +58,11 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/collab-edit
     console.log('⚠️ Server starting without database. Auth features may fail.');
   });
 
-const PORT = process.env.PORT || 5001;
-server.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5001;
+  server.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+}
 
+module.exports = server;
